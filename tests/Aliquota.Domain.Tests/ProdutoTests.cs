@@ -24,7 +24,7 @@ namespace Aliquota.Domain.Tests
 
         [Fact(DisplayName = "00 Obter Todos Os Produtod")]
         [Trait("Categoria", "Produto")]
-        public async void ObterProdutos_ObterListaDeProdutos_DeveObterTodosProdutos()
+        public void ObterProdutos_ObterListaDeProdutos_DeveObterTodosProdutos()
         {
             // Arrange
             var mocker = new AutoMocker();
@@ -44,7 +44,7 @@ namespace Aliquota.Domain.Tests
 
         [Fact(DisplayName = "00 Obter Produto Por Id")]
         [Trait("Categoria", "Produto")]
-        public async void ObterProdutos_ObterProdutoPorIds_DeveObterProdutoPorId()
+        public void ObterProdutos_ObterProdutoPorIds_DeveObterProdutoPorId()
         {
             // Arrange
             var produtoId = Guid.Parse("7ABC988A-2A69-41D6-89A6-93A6B478C500"); 
@@ -56,19 +56,21 @@ namespace Aliquota.Domain.Tests
                 .ReturnsAsync(_produtoTestsFixture.GerarProdutoPorId);
 
             // Act
-            var produtinho = produtoService.ObterProdutoPorId(produtoId).Result;
+            var produto = produtoService.ObterProdutoPorId(produtoId).Result;
 
             // Assert
-            Assert.Equal(produtoId, produtinho.Id);
+            Assert.Equal(produtoId, produto.Id);
+            mocker.GetMock<IProdutoRepository>().Verify(r => r.ObterPorId(produtoId), Times.Once);
         }
 
-        [Fact(DisplayName = "00 Obter Produto Por Id")]
+        [Fact(DisplayName = "01 Adicionar Produto Válido"), TestPriority(1)]
         [Trait("Categoria", "Produto")]
-        public async void ObterProdutos_ObterProdutoPorId_DeveObterProdutoPorId()
+        public async void AdicionarProduto_NovoProdutoValido_DeveCadastrarProduto()
         {
-            // Arrange
+            // AAA 
+            //var produtoValido = new Produto(Guid.NewGuid(), "Fundo XYZ", 12,true, DateTime.Now);
             var produtoValido = _produtoTestsFixture.GerarProdutoValido();
-
+       
             /* AutoMocker Elimina a necessidade de mapear todas as instancias das dependencias
             var produtoRepo = new Mock<IProdutoRepository>();
             var posicaoRepo = new Mock<IPosicaoRepository>();
@@ -78,36 +80,11 @@ namespace Aliquota.Domain.Tests
             var mocker = new AutoMocker();
             var produtoService = mocker.CreateInstance<ProdutoService>();
 
-            // Act
+            // ACT;
             await produtoService.Adicionar(produtoValido);
 
             // Assert
             mocker.GetMock<IProdutoRepository>().Verify(r => r.Adicionar(produtoValido), Times.Once);
-        }
-
-        [Fact(DisplayName = "01 Adicionar Produto Válido"), TestPriority(1)]
-        [Trait("Categoria", "Produto")]
-        public async void AdicionarProduto_NovoProdutoValido_DeveCadastrarProduto()
-        {
-            // AAA
-            //var produto = new Produto(Guid.NewGuid(), "Fundo XYZ", 12,true, DateTime.Now);  
-            var produtoValido = _produtoTestsFixture.GerarProdutoValido();
-
-            var produtoRepo = new Mock<IProdutoRepository>();
-            var posicaoRepo = new Mock<IPosicaoRepository>();
-            var notificador = new Mock<INotificador>();
-
-            var produtoService = new ProdutoService(produtoRepo.Object, posicaoRepo.Object, notificador.Object);
-
-            // ACT
-            //await produtoService.Adicionar(produto);
-            //await produtoService.Adicionar(ProdutoValido);
-            await produtoService.Adicionar(produtoValido);
-
-            // Assert
-            //produtoRepo.Verify(r => r.Adicionar(produto), Times.Once);
-            //produtoRepo.Verify(r => r.Adicionar(ProdutoValido), Times.Once);
-            produtoRepo.Verify(r => r.Adicionar(produtoValido), Times.Once);
         }
 
         [Fact(DisplayName = "02 Adicionar Produto Inválido"), TestPriority(2)]
@@ -115,22 +92,16 @@ namespace Aliquota.Domain.Tests
         public async void AdicionarProduto_NovoProdutoInvalido_NaoDeveCadastrarProduto()
         {
             // AAA
-            //var produto = new Produto(Guid.NewGuid(), "Fund", 12, true, DateTime.Now);
             var produtoInvalido = _produtoTestsFixture.GerarProdutoInvalido();
 
-            var produtoRepo = new Mock<IProdutoRepository>();
-            var posicaoRepo = new Mock<IPosicaoRepository>();
-            var notificador = new Mock<INotificador>();
-
-            var produtoService = new ProdutoService(produtoRepo.Object, posicaoRepo.Object, notificador.Object);
+            var mocker = new AutoMocker();
+            var produtoService = mocker.CreateInstance<ProdutoService>();
 
             // ACT
-            //await produtoService.Adicionar(produto);
             await produtoService.Adicionar(produtoInvalido);
 
             // Assert
-            //produtoRepo.Verify(r => r.Adicionar(produto), Times.Never);
-            produtoRepo.Verify(r => r.Adicionar(produtoInvalido), Times.Never);
+            mocker.GetMock<IProdutoRepository>().Verify(r => r.Adicionar(produtoInvalido), Times.Never);
         }
 
         [Fact(DisplayName = "03 Adicionar Produto Repedido"), TestPriority(3)]
@@ -140,11 +111,8 @@ namespace Aliquota.Domain.Tests
             // AAA
             var produto = new Produto(Guid.NewGuid(), "Fundo XYZ", 12, true, DateTime.Now);
 
-            var produtoRepo = new Mock<IProdutoRepository>();
-            var posicaoRepo = new Mock<IPosicaoRepository>();
-            var notificador = new Mock<INotificador>();
-
-            var produtoService = new ProdutoService(produtoRepo.Object, posicaoRepo.Object, notificador.Object);
+            var mocker = new AutoMocker();
+            var produtoService = mocker.CreateInstance<ProdutoService>();
 
             await produtoService.Adicionar(produto);
 
@@ -154,7 +122,7 @@ namespace Aliquota.Domain.Tests
             await produtoService.Adicionar(produtoRepetido);
 
             // Assert
-            produtoRepo.Verify(r => r.Adicionar(produtoRepetido), Times.Never);
+            mocker.GetMock<IProdutoRepository>().Verify(r => r.Adicionar(produtoRepetido), Times.Never);
         }
 
         [Fact(DisplayName = "04 Atualizar Produto Válido"), TestPriority(4)]
@@ -166,11 +134,8 @@ namespace Aliquota.Domain.Tests
 
             var produto = new Produto(produtoId, "Fundo XYZ", 12, true, DateTime.Now);
 
-            var produtoRepo = new Mock<IProdutoRepository>();
-            var posicaoRepo = new Mock<IPosicaoRepository>();
-            var notificador = new Mock<INotificador>();
-
-            var produtoService = new ProdutoService(produtoRepo.Object, posicaoRepo.Object, notificador.Object);
+            var mocker = new AutoMocker();
+            var produtoService = mocker.CreateInstance<ProdutoService>();
 
             await produtoService.Adicionar(produto);
 
@@ -180,7 +145,7 @@ namespace Aliquota.Domain.Tests
             await produtoService.Atualizar(produtoAtualizado);
 
             // Assert
-            produtoRepo.Verify(r => r.Atualizar(produtoAtualizado), Times.Once);
+            mocker.GetMock<IProdutoRepository>().Verify(r => r.Atualizar(produtoAtualizado), Times.Once);
         }
 
         [Fact(DisplayName = "05 Atualizar Produto Inválido"), TestPriority(5)]
@@ -192,11 +157,8 @@ namespace Aliquota.Domain.Tests
 
             var produto = new Produto(produtoId, "Fundo XYZ", 12, true, DateTime.Now);
 
-            var produtoRepo = new Mock<IProdutoRepository>();
-            var posicaoRepo = new Mock<IPosicaoRepository>();
-            var notificador = new Mock<INotificador>();
-
-            var produtoService = new ProdutoService(produtoRepo.Object, posicaoRepo.Object, notificador.Object);
+            var mocker = new AutoMocker();
+            var produtoService = mocker.CreateInstance<ProdutoService>();
 
             await produtoService.Adicionar(produto);
 
@@ -206,7 +168,7 @@ namespace Aliquota.Domain.Tests
             await produtoService.Atualizar(produtoAtualizado);
 
             // Assert
-            produtoRepo.Verify(r => r.Atualizar(produtoAtualizado), Times.Never);
+            mocker.GetMock<IProdutoRepository>().Verify(r => r.Atualizar(produtoAtualizado), Times.Never);
         }
 
         [Fact(DisplayName = "06 Atualizar Produto Repetido", Skip = "Está Executando Atualizar Quando Não Deveria"), TestPriority(6)]
@@ -216,11 +178,8 @@ namespace Aliquota.Domain.Tests
             // AAA
             var primeiroProduto = new Produto(Guid.NewGuid(), "Fundo XYZ", 12, true, DateTime.Now);
 
-            var produtoRepo = new Mock<IProdutoRepository>();
-            var posicaoRepo = new Mock<IPosicaoRepository>();
-            var notificador = new Mock<INotificador>();
-
-            var produtoService = new ProdutoService(produtoRepo.Object, posicaoRepo.Object, notificador.Object);
+            var mocker = new AutoMocker();
+            var produtoService = mocker.CreateInstance<ProdutoService>();
 
             await produtoService.Adicionar(primeiroProduto);
 
@@ -234,7 +193,7 @@ namespace Aliquota.Domain.Tests
             await produtoService.Atualizar(produtoAtualizadoRepetido);
 
             // Assert
-            produtoRepo.Verify(r => r.Atualizar(produtoAtualizadoRepetido), Times.Never);
+            mocker.GetMock<IProdutoRepository>().Verify(r => r.Atualizar(produtoAtualizadoRepetido), Times.Never);
         }
 
         [Fact(DisplayName = "07 Remover Produto Sem Posições"), TestPriority(7)]
@@ -245,11 +204,8 @@ namespace Aliquota.Domain.Tests
             var produtoId = Guid.NewGuid();
             var produto = new Produto(produtoId,"Fundo XYZ", 12, true, DateTime.Now);
 
-            var produtoRepo = new Mock<IProdutoRepository>();
-            var posicaoRepo = new Mock<IPosicaoRepository>();
-            var notificador = new Mock<INotificador>();
-
-            var produtoService = new ProdutoService(produtoRepo.Object, posicaoRepo.Object, notificador.Object);
+            var mocker = new AutoMocker();
+            var produtoService = mocker.CreateInstance<ProdutoService>();
 
             await produtoService.Adicionar(produto);
 
@@ -257,7 +213,7 @@ namespace Aliquota.Domain.Tests
             await produtoService.Remover(produtoId);
 
             // Assert
-            produtoRepo.Verify(r => r.Remover(produtoId), Times.Once);
+            mocker.GetMock<IProdutoRepository>().Verify(r => r.Remover(produtoId), Times.Once);
         }
 
         [Fact(DisplayName = "08 Remover Produto Com Posições", Skip = "Cenário Incompleto, pois não valida cenário"), TestPriority(8)]
@@ -268,24 +224,19 @@ namespace Aliquota.Domain.Tests
             var produtoId = Guid.NewGuid();
             var produto = new Produto(produtoId, "Fundo XYZ", 12, true, DateTime.Now);
 
-            var produtoRepo = new Mock<IProdutoRepository>();
-            var posicaoRepo = new Mock<IPosicaoRepository>();
-            var notificador = new Mock<INotificador>();
-
-            var produtoService = new ProdutoService(produtoRepo.Object, posicaoRepo.Object, notificador.Object);
+            var mocker = new AutoMocker();
+            var produtoService = mocker.CreateInstance<ProdutoService>();
+            var posicaoService = mocker.CreateInstance<PosicaoService>();
 
             await produtoService.Adicionar(produto);
-
             var posicao = new Posicao(Guid.NewGuid(), produtoId, DateTime.Now, DateTime.Now, 100.14m, true);
-            var posicaoService = new PosicaoService(posicaoRepo.Object, produtoRepo.Object, notificador.Object);
-
             await posicaoService.Adicionar(posicao);
 
             // ACT
             await produtoService.Remover(produtoId);
 
             // Assert
-            produtoRepo.Verify(r => r.Remover(produtoId), Times.Never);
+            mocker.GetMock<IProdutoRepository>().Verify(r => r.Remover(produtoId), Times.Never);
         }
     }
 }

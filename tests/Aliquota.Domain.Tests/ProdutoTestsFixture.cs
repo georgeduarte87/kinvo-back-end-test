@@ -1,10 +1,10 @@
 ﻿using Xunit;
-using System;
-using Aliquota.Domain.Models;
 using Bogus;
-using System.Collections.Generic;
+using System;
 using System.Linq;
-using System.Threading.Tasks;
+using Aliquota.Domain.Models;
+using System.Collections.Generic;
+
 
 namespace Aliquota.Domain.Tests
 {
@@ -30,42 +30,10 @@ namespace Aliquota.Domain.Tests
             }
         }
 
-        /*
-        public Produto GerarProdutoValido()
-        {
-            //var nomeFundo = new Faker().Company.CompanyName();
-
-            //var produto = new Produto(Guid.NewGuid(), "Fundo XYZ", 12, true, DateTime.Now);
-
-            var produto = new Faker<Produto>("pt_BR")
-                .CustomInstantiator(f => new Produto(
-                    Guid.NewGuid(),
-                    f.Company.CompanyName(),
-                    f.Random.Number(0,12),
-                    true,
-                    f.Date.Past(5, DateTime.Now.AddYears(-1))));
-
-            return produto;
-        }*/
-
         public Produto GerarProdutoValido()
         {
             return GerarProdutos(1, true).FirstOrDefault();
         }
-
-        /*
-        public Produto GerarProdutoPorId()
-        {
-            var produto = new Faker<Produto>("pt_BR")
-                .CustomInstantiator(f => new Produto(
-                    Guid.Parse("7ABC988A-2A69-41D6-89A6-93A6B478C500"),
-                    f.Company.CompanyName(),
-                    f.Random.Number(0, 12),
-                    true,
-                    f.Date.Past(5, DateTime.Now.AddYears(-1))));
-
-            return produto;
-        } */
 
         public IEnumerable<Produto> ObterProdutosVariados()
         {
@@ -79,10 +47,6 @@ namespace Aliquota.Domain.Tests
 
         public IEnumerable<Produto> GerarProdutos(int quantidade, bool ativo)
         {
-            //var nomeFundo = new Faker().Company.CompanyName();
-
-            //var produto = new Produto(Guid.NewGuid(), "Fundo XYZ", 12, true, DateTime.Now);
-
             var produtos = new Faker<Produto>("pt_BR")
                 .CustomInstantiator(f => new Produto(
                     Guid.NewGuid(),
@@ -96,8 +60,6 @@ namespace Aliquota.Domain.Tests
 
         public Produto GerarProdutoInvalido()
         {
-            // var produto = new Produto(Guid.NewGuid(), "Fund", 12, true, DateTime.Now);
-
             var produto = new Faker<Produto>("pt_BR")
                 .CustomInstantiator(f => new Produto(
                     Guid.NewGuid(),
@@ -109,9 +71,6 @@ namespace Aliquota.Domain.Tests
             return produto;
         }
 
-        public void Dispose()
-        {
-            // 
-        }
+        public void Dispose() { }
     }
 }
