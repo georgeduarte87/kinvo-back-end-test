@@ -27,7 +27,8 @@ namespace Aliquota.API.Controllers
         [HttpGet]
         public async Task<IEnumerable<ProdutoViewModel>> ObterTodos()
         {
-            return _mapper.Map<IEnumerable<ProdutoViewModel>>(await _produtoRepository.ObterTodos());
+            //return _mapper.Map<IEnumerable<ProdutoViewModel>>(await _produtoRepository.ObterTodos());
+            return _mapper.Map<IEnumerable<ProdutoViewModel>>(await _produtoService.ObterProdutosAtivos());
         }
 
         [HttpGet("{id:guid}")]

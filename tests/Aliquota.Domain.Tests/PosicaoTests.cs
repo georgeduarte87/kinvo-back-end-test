@@ -4,7 +4,7 @@ using System;
 using Aliquota.Domain.Interfaces;
 using Aliquota.Domain.Models;
 using Aliquota.Domain.Services;
-
+using Moq.AutoMock;
 
 namespace Aliquota.Domain.Tests
 {
@@ -17,17 +17,20 @@ namespace Aliquota.Domain.Tests
             // AAA
             var posicao = new Posicao(Guid.NewGuid(), Guid.NewGuid(), DateTime.Now, DateTime.Now, 100.14m, true);
 
+            var mocker = new AutoMocker();
+            var posicaoService = mocker.CreateInstance<PosicaoService>(); 
+
+            /*
             var posicaoRepo = new Mock<IPosicaoRepository>();
             var produtoRepo = new Mock<IProdutoRepository>();
             var notificador = new Mock<INotificador>();
-
-            var posicaoService = new PosicaoService(posicaoRepo.Object, produtoRepo.Object, notificador.Object);
+            var posicaoService = new PosicaoService(posicaoRepo.Object, produtoRepo.Object, notificador.Object); */
 
             // ACT
             await posicaoService.Adicionar(posicao);
 
             // Assert
-            posicaoRepo.Verify(r => r.Adicionar(posicao), Times.Once);
+            mocker.GetMock<IPosicaoRepository>().Verify(r => r.Adicionar(posicao), Times.Once);
         }
 
         [Fact(DisplayName = "02 Adicionar Posição Invalida")]
@@ -37,17 +40,14 @@ namespace Aliquota.Domain.Tests
             // AAA
             var posicao = new Posicao(Guid.NewGuid(), Guid.NewGuid(), DateTime.Now, DateTime.Now, 0, true);
 
-            var posicaoRepo = new Mock<IPosicaoRepository>();
-            var produtoRepo = new Mock<IProdutoRepository>();
-            var notificador = new Mock<INotificador>();
-
-            var posicaoService = new PosicaoService(posicaoRepo.Object, produtoRepo.Object, notificador.Object);
+            var mocker = new AutoMocker();
+            var posicaoService = mocker.CreateInstance<PosicaoService>();
 
             // ACT
             await posicaoService.Adicionar(posicao);
 
             // Assert
-            posicaoRepo.Verify(r => r.Adicionar(posicao), Times.Never);
+            mocker.GetMock<IPosicaoRepository>().Verify(r => r.Adicionar(posicao), Times.Never);
         }
 
 
@@ -61,11 +61,8 @@ namespace Aliquota.Domain.Tests
 
             var posicao = new Posicao(produtoId, posicaoId, DateTime.Now, DateTime.Now, 100, true);
 
-            var posicaoRepo = new Mock<IPosicaoRepository>();
-            var produtoRepo = new Mock<IProdutoRepository>();
-            var notificador = new Mock<INotificador>();
-
-            var posicaoService = new PosicaoService(posicaoRepo.Object, produtoRepo.Object, notificador.Object);
+            var mocker = new AutoMocker();
+            var posicaoService = mocker.CreateInstance<PosicaoService>();
 
             await posicaoService.Adicionar(posicao);
 
@@ -76,7 +73,7 @@ namespace Aliquota.Domain.Tests
             await posicaoService.Atualizar(posicaoAtualizada);
 
             // Assert
-            posicaoRepo.Verify(r => r.Atualizar(posicaoAtualizada), Times.Once);
+            mocker.GetMock<IPosicaoRepository>().Verify(r => r.Atualizar(posicaoAtualizada), Times.Once);
         }
 
         [Fact(DisplayName = "04 Atualizar Posição Inválida")]
@@ -89,11 +86,8 @@ namespace Aliquota.Domain.Tests
 
             var posicao = new Posicao(produtoId, posicaoId, DateTime.Now, DateTime.Now, 0, true);
 
-            var posicaoRepo = new Mock<IPosicaoRepository>();
-            var produtoRepo = new Mock<IProdutoRepository>();
-            var notificador = new Mock<INotificador>();
-
-            var posicaoService = new PosicaoService(posicaoRepo.Object, produtoRepo.Object, notificador.Object);
+            var mocker = new AutoMocker();
+            var posicaoService = mocker.CreateInstance<PosicaoService>();
 
             await posicaoService.Adicionar(posicao);
 
@@ -104,7 +98,7 @@ namespace Aliquota.Domain.Tests
             await posicaoService.Atualizar(posicaoAtualizada);
 
             // Assert
-            posicaoRepo.Verify(r => r.Atualizar(posicaoAtualizada), Times.Never);
+            mocker.GetMock<IPosicaoRepository>().Verify(r => r.Atualizar(posicaoAtualizada), Times.Never);
         }
 
         [Fact(DisplayName = "05 Remover Posição Válida")]
@@ -116,17 +110,14 @@ namespace Aliquota.Domain.Tests
 
             var posicao = new Posicao(posicaoId, Guid.NewGuid(), DateTime.Now, DateTime.Now, 100.14m, true);
 
-            var posicaoRepo = new Mock<IPosicaoRepository>();
-            var produtoRepo = new Mock<IProdutoRepository>();
-            var notificador = new Mock<INotificador>();
-
-            var posicaoService = new PosicaoService(posicaoRepo.Object, produtoRepo.Object, notificador.Object);
+            var mocker = new AutoMocker();
+            var posicaoService = mocker.CreateInstance<PosicaoService>();
 
             // ACT
             await posicaoService.Remover(posicaoId);
 
             // Assert
-            posicaoRepo.Verify(r => r.Remover(posicaoId), Times.Once);
+            mocker.GetMock<IPosicaoRepository>().Verify(r => r.Remover(posicaoId), Times.Once);
         }
 
         [Fact(DisplayName = "06 Remover Posição Inválida")]
@@ -138,17 +129,14 @@ namespace Aliquota.Domain.Tests
 
             var posicao = new Posicao(Guid.NewGuid(), Guid.NewGuid(), DateTime.Now, DateTime.Now, 100.14m, true);
 
-            var posicaoRepo = new Mock<IPosicaoRepository>();
-            var produtoRepo = new Mock<IProdutoRepository>();
-            var notificador = new Mock<INotificador>();
-
-            var posicaoService = new PosicaoService(posicaoRepo.Object, produtoRepo.Object, notificador.Object);
+            var mocker = new AutoMocker();
+            var posicaoService = mocker.CreateInstance<PosicaoService>();
 
             // ACT
             await posicaoService.Remover(posicaoId);
 
             // Assert
-            posicaoRepo.Verify(r => r.Remover(posicaoId), Times.Once);
+            mocker.GetMock<IPosicaoRepository>().Verify(r => r.Remover(posicaoId), Times.Once);
         }
 
     }
