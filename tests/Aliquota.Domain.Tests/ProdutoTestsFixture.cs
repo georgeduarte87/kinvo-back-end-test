@@ -4,7 +4,8 @@ using System;
 using System.Linq;
 using Aliquota.Domain.Models;
 using System.Collections.Generic;
-
+using Moq.AutoMock;
+using Aliquota.Domain.Services;
 
 namespace Aliquota.Domain.Tests
 {
@@ -13,6 +14,8 @@ namespace Aliquota.Domain.Tests
 
     public class ProdutoTestsFixture : IDisposable
     {
+        public ProdutoService ProdutoService;
+        public AutoMocker Mocker;
 
         public Produto GerarProdutoPorId
         {
@@ -28,6 +31,14 @@ namespace Aliquota.Domain.Tests
 
                 return produto;
             }
+        }
+
+        public ProdutoService ObterProdutoService()
+        {
+            Mocker = new AutoMocker();
+            ProdutoService = Mocker.CreateInstance<ProdutoService>();
+
+            return ProdutoService;
         }
 
         public Produto GerarProdutoValido()
