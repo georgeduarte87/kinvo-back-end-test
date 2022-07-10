@@ -1,10 +1,13 @@
-﻿using Moq;
+﻿using System;
+using System.Linq;
 using Xunit;
-using System;
+using Moq;
+using Moq.AutoMock;
 using Aliquota.Domain.Models;
 using Aliquota.Domain.Services;
 using Aliquota.Domain.Interfaces;
-using System.Linq;
+
+using System.Threading.Tasks;
 
 namespace Aliquota.Domain.Tests
 {
@@ -12,14 +15,6 @@ namespace Aliquota.Domain.Tests
     [Collection(nameof(ProdutoCollection))]
     public class ProdutoTests
     {
-        /*
-        public Produto ProdutoValido;
-
-        public ProdutoTests()
-        {
-            ProdutoValido = new Produto(Guid.NewGuid(),"Fundo XYZ",12,true,DateTime.Now);
-        }*/
-
         private readonly ProdutoTestsFixture _produtoTestsFixture;
 
         public ProdutoTests(ProdutoTestsFixture produtoTestsFixture)
@@ -32,20 +27,62 @@ namespace Aliquota.Domain.Tests
         public async void ObterProdutos_ObterListaDeProdutos_DeveObterTodosProdutos()
         {
             // Arrange
-            var produtoValido = _produtoTestsFixture.GerarProdutoValido();
-            var produtoRepo = new Mock<IProdutoRepository>();
-            var posicaoRepo = new Mock<IPosicaoRepository>();
-            var notificador = new Mock<INotificador>();
+            var mocker = new AutoMocker();
+            var produtoService = mocker.CreateInstance<ProdutoService>();
 
-            var produtoService = new ProdutoService(produtoRepo.Object, posicaoRepo.Object, notificador.Object);
-
-            await produtoService.Adicionar(produtoValido);
+            mocker.GetMock<IProdutoRepository>().Setup(p => p.ObterTodos()).Returns(async () =>
+            {
+                return await Task.FromResult(_produtoTestsFixture.ObterProdutosVariados());
+            });
 
             // Act
             var produtos = produtoService.ObterProdutosAtivos().Result;
 
             // Assert
             Assert.True(produtos.Any());
+        }
+
+        [Fact(DisplayName = "00 Obter Produto Por Id")]
+        [Trait("Categoria", "Produto")]
+        public async void ObterProdutos_ObterProdutoPorIds_DeveObterProdutoPorId()
+        {
+            // Arrange
+            var produtoId = Guid.Parse("7ABC988A-2A69-41D6-89A6-93A6B478C500"); 
+            var mocker = new AutoMocker();
+            var produtoService = mocker.CreateInstance<ProdutoService>();
+
+            mocker.GetMock<IProdutoRepository>()
+                .Setup(p => p.ObterPorId(produtoId))
+                .ReturnsAsync(_produtoTestsFixture.GerarProdutoPorId);
+
+            // Act
+            var produtinho = produtoService.ObterProdutoPorId(produtoId).Result;
+
+            // Assert
+            Assert.Equal(produtoId, produtinho.Id);
+        }
+
+        [Fact(DisplayName = "00 Obter Produto Por Id")]
+        [Trait("Categoria", "Produto")]
+        public async void ObterProdutos_ObterProdutoPorId_DeveObterProdutoPorId()
+        {
+            // Arrange
+            var produtoValido = _produtoTestsFixture.GerarProdutoValido();
+
+            /* AutoMocker Elimina a necessidade de mapear todas as instancias das dependencias
+            var produtoRepo = new Mock<IProdutoRepository>();
+            var posicaoRepo = new Mock<IPosicaoRepository>();
+            var notificador = new Mock<INotificador>();
+            var produtoService = new ProdutoService(produtoRepo.Object, posicaoRepo.Object, notificador.Object); */
+
+            var mocker = new AutoMocker();
+            var produtoService = mocker.CreateInstance<ProdutoService>();
+
+            // Act
+            await produtoService.Adicionar(produtoValido);
+
+            // Assert
+            mocker.GetMock<IProdutoRepository>().Verify(r => r.Adicionar(produtoValido), Times.Once);
         }
 
         [Fact(DisplayName = "01 Adicionar Produto Válido"), TestPriority(1)]

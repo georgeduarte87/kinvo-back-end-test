@@ -23,6 +23,11 @@ namespace Aliquota.Domain.Services
             return await _produtoRepository.ObterTodos();
         }
 
+        public async Task<Produto> ObterProdutoPorId(Guid id)
+        {
+            return await _produtoRepository.ObterPorId(id);
+        }
+
         public async Task Adicionar(Produto produto)
         {
             if (!ExecutarValidacao(new ProdutoValidation(), produto)) return;
